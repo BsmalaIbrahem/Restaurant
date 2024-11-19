@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('image');
             $table->double('price')->nullable();
             $table->json('options')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
