@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,9 +26,13 @@ class AuthController extends Controller
         ]);
     }
 
-    public function register()
+    public function register(RegisterRequest $request)
     {
-        //
+        $user = User::create($request->all());
+        return ApiResponse::success('logged in', [
+            'token'=> $user->createToken('api')->plainTextToken,
+            'user' => auth()->guard('user')->user(),
+        ]);
     }
 
     public function logout()
