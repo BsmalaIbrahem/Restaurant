@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class AuthController extends Controller
         $user = $request->authenticate();
         return ApiResponse::success('logged in', [
             'token'=>$user->createToken('api')->plainTextToken,
-            'user' => $user,
+            'user' => new UserResource($user),
         ]);
     }
 
@@ -26,7 +27,7 @@ class AuthController extends Controller
         $user = User::create($request->all());
         return ApiResponse::success('logged in', [
             'token'=> $user->createToken('api')->plainTextToken,
-            'user' => $user,
+            'user' => new UserResource($user),
         ]);
     }
 
