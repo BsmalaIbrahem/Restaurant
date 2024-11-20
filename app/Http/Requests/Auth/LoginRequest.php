@@ -2,9 +2,13 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
@@ -34,6 +38,28 @@ class LoginRequest extends FormRequest
             }],
             'password' => 'required | string',
         ];
+    }
+
+    public function authenticate()
+    {
+        if($this->header('guard') == 'admin'){
+           return  $this->checkPassword(Admin::class);
+        }
+        elseif($this->header('guard') == 'user')
+        {
+           return  $this->checkPassword(User::class);
+        }
+    }
+
+    private function checkPassword($model)
+    {
+        $data = $model::where('email',$this->input('email'))->first();
+        if(!Hash::check($this->input('password'), $data['password'])){
+            throw ValidationException::withMessages([
+                'password' => trans('password is wrong'),
+            ]);
+        }
+        return $data;
     }
 
     protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)

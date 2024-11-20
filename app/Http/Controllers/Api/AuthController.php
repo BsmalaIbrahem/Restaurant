@@ -14,15 +14,10 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $guard = $request->header('guard', 'user');
-        if(!Auth::guard($guard)->attempt(['email' => $request['email'], 'password' => $request['password']]))
-        {
-            return ApiResponse::failed('password is Wrong');
-        }
-
+        $user = $request->authenticate();
         return ApiResponse::success('logged in', [
-            'token'=>$request->user($guard)->createToken('api')->plainTextToken,
-            'user' => auth()->guard($guard)->user(),
+            'token'=>$user->createToken('api')->plainTextToken,
+            'user' => $user,
         ]);
     }
 
@@ -31,7 +26,7 @@ class AuthController extends Controller
         $user = User::create($request->all());
         return ApiResponse::success('logged in', [
             'token'=> $user->createToken('api')->plainTextToken,
-            'user' => auth()->guard('user')->user(),
+            'user' => $user,
         ]);
     }
 
